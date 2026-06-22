@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Estoque Emultec por Estado — 18/06/2026</title>
+<title>Estoque Emultec por Estado — 22/06/2026</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f6f8; color: #1a1a1a; padding: 24px; }
@@ -39,10 +39,6 @@ tbody tr:hover td { background: #f0f5fa; }
 tfoot td { background: #1f4e79; color: #fff; font-weight: 600; font-size: 12px; padding: 10px 8px; }
 tfoot td.num { text-align: right; }
 .dash { color: #ccc; }
-.summary { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-.card { background: #fff; border-radius: 8px; padding: 12px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); min-width: 120px; }
-.card-label { font-size: 11px; color: #888; margin-bottom: 2px; }
-.card-value { font-size: 22px; font-weight: 600; color: #1f4e79; }
 @media print {
   body { padding: 10px; background: #fff; }
   .btn-group, .controls, .no-print { display: none !important; }
@@ -62,9 +58,8 @@ tfoot td.num { text-align: right; }
 
 <div id="app">
 <h1>Relatório de Estoque por Estado</h1>
-<p class="subtitle">Fonte: bi.emultec.com.br — estoque_analítico (Locais) — 18/06/2026</p>
+<p class="subtitle">Fonte: bi.emultec.com.br — estoque_analítico (Locais) — 22/06/2026</p>
 
-<div class="summary" id="summary"></div>
 
 <p class="section-label">Estado</p>
 <div class="btn-group" id="estBtns">
@@ -73,6 +68,7 @@ tfoot td.num { text-align: right; }
   <button class="btn" data-val="sc"><span class="dot" style="background:#1D9E75"></span>SC (C67)</button>
   <button class="btn" data-val="sp"><span class="dot" style="background:#D85A30"></span>SP (C63)</button>
   <button class="btn" data-val="pr"><span class="dot" style="background:#7F77DD"></span>PR (C64)</button>
+  <button class="btn" data-val="ba"><span class="dot" style="background:#E6A817"></span>BA (C68)</button>
 </div>
 
 <p class="section-label">Família</p>
@@ -89,53 +85,53 @@ tfoot td.num { text-align: right; }
 
 <script>
 const allData = [
-  {f:"ANASTOMAT",cod:"ZSR-DCA-12C",d:"Circuncisão 12C",rs:1,sc:0,sp:0,pr:2},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-14C",d:"Circuncisão 14C",rs:1,sc:0,sp:2,pr:2},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-16C",d:"Circuncisão 16C",rs:1,sc:0,sp:3,pr:2},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-18C",d:"Circuncisão 18C",rs:5,sc:6,sp:3,pr:3},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-22C",d:"Circuncisão 22C",rs:5,sc:10,sp:6,pr:5},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-26C",d:"Circuncisão 26C",rs:5,sc:10,sp:4,pr:5},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-30C",d:"Circuncisão 30C",rs:7,sc:10,sp:7,pr:4},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-34C",d:"Circuncisão 34C",rs:5,sc:8,sp:6,pr:5},
-  {f:"CALIBER",cod:"VCB-10X8",d:"Membrana Reconstrutora",rs:1,sc:0,sp:1,pr:3},
-  {f:"ELEFANT",cod:"ASP165",d:"Cânula Irrigação 35cm",rs:5,sc:2,sp:4,pr:3},
-  {f:"ELEFANT",cod:"ASP185",d:"Cânula Irrigação 45cm",rs:292,sc:19,sp:90,pr:17},
-  {f:"INFRA",cod:"ES2814",d:"Prótese Titan Infrapubic 14cm",rs:2,sc:0,sp:1,pr:0},
-  {f:"INFRA",cod:"ES2816",d:"Prótese Titan Infrapubic 16cm",rs:4,sc:0,sp:1,pr:0},
-  {f:"INFRA",cod:"ES2818",d:"Prótese Titan Infrapubic 18cm",rs:3,sc:0,sp:2,pr:1},
-  {f:"INFRA",cod:"ES2820",d:"Prótese Titan Infrapubic 20cm",rs:1,sc:0,sp:1,pr:0},
-  {f:"INFRA",cod:"ES2822",d:"Prótese Titan Infrapubic 22cm",rs:3,sc:0,sp:1,pr:0},
-  {f:"INTRUM. GENESIS",cod:"39801-MCC",d:"Medidor Corpo Cavernoso",rs:7,sc:0,sp:0,pr:0},
-  {f:"INTRUM. GENESIS",cod:"EXTENSORES",d:"Extensores Genesis",rs:1,sc:0,sp:0,pr:0},
-  {f:"INTRUM. TITAN",cod:"AFASTADOR L.STAR",d:"Afastador Lone Star",rs:3,sc:0,sp:0,pr:0},
-  {f:"INTRUM. TITAN",cod:"DILATADORES BROOKS",d:"Kit Dilatadores Brooks",rs:4,sc:0,sp:0,pr:0},
-  {f:"INTRUM. TITAN",cod:"KITINSTRTITAN",d:"Kit Instrumentos Titan",rs:3,sc:0,sp:0,pr:2},
-  {f:"INTRUM. TITAN",cod:"QB55552",d:"Furlow Inserter",rs:11,sc:0,sp:0,pr:0},
-  {f:"INTRUM. TITAN",cod:"QB5558",d:"Kit Dilatadores Rossello",rs:2,sc:0,sp:2,pr:0},
-  {f:"KIT DE MONTAGEM",cod:"519150",d:"Kit Montagem s/ Extensor",rs:0,sc:1,sp:1,pr:1},
-  {f:"KIT DE MONTAGEM",cod:"519170",d:"Kit Montagem Titan",rs:9,sc:1,sp:3,pr:2},
-  {f:"KIT DE MONTAGEM",cod:"519310",d:"Extensor Prótese Titan 0,5",rs:6,sc:1,sp:1,pr:1},
-  {f:"MALEAVEL",cod:"519250",d:"Implante Maleável Genesis 9,5mm",rs:15,sc:2,sp:3,pr:6},
-  {f:"MALEAVEL",cod:"519260",d:"Implante Maleável Genesis 11mm",rs:21,sc:2,sp:3,pr:6},
-  {f:"MALEAVEL",cod:"519270",d:"Implante Maleável Genesis 13mm",rs:9,sc:1,sp:3,pr:6},
-  {f:"NARROW INFRA",cod:"519300",d:"Narrow Kit Montagem Titan",rs:2,sc:1,sp:0,pr:0},
-  {f:"NARROW INFRA",cod:"EN2814",d:"Prótese NB Infra 14cm",rs:1,sc:0,sp:0,pr:0},
-  {f:"NARROW INFRA",cod:"EN2816",d:"Prótese NB Infra 16cm",rs:1,sc:0,sp:0,pr:0},
-  {f:"NARROW INFRA",cod:"EN2818",d:"Prótese NB Infra 18cm",rs:1,sc:0,sp:0,pr:0},
-  {f:"PENO",cod:"E17924",d:"Prótese Titan Escrotal 24cm",rs:1,sc:0,sp:0,pr:0},
-  {f:"PENO",cod:"ES2914",d:"Prótese Titan Escrotal 14cm",rs:0,sc:0,sp:2,pr:2},
-  {f:"PENO",cod:"ES2916",d:"Prótese Titan Escrotal 16cm",rs:2,sc:1,sp:3,pr:2},
-  {f:"PENO",cod:"ES2918",d:"Prótese Titan Escrotal 18cm",rs:1,sc:0,sp:1,pr:0},
-  {f:"PENO",cod:"ES2920",d:"Prótese Titan Escrotal 20cm",rs:2,sc:1,sp:3,pr:1},
-  {f:"PENO",cod:"ES2922",d:"Prótese Titan Escrotal 22cm",rs:0,sc:0,sp:1,pr:0},
-  {f:"RESERVATORIO",cod:"ER8075",d:"Reservatório OTR 75cc",rs:3,sc:1,sp:3,pr:4},
-  {f:"RESERVATORIO",cod:"ER8125",d:"Reservatório OTR 125cc",rs:16,sc:0,sp:3,pr:1},
-  {f:"UROLIFT",cod:"787.050",d:"Cesto Processamento Urolift",rs:0,sc:0,sp:0,pr:1},
-  {f:"UROLIFT",cod:"UL-SCOPE",d:"Cistoscópio 2,9mm",rs:13,sc:3,sp:0,pr:2},
-  {f:"UROLIFT",cod:"UL-SHEATH",d:"Bainha 20 FR",rs:3,sc:1,sp:0,pr:1},
-  {f:"UROLIFT",cod:"UL-TRAY",d:"Cesto Processamento",rs:3,sc:1,sp:0,pr:0},
-  {f:"UROLIFT",cod:"UL-VO",d:"Obturador Visual",rs:3,sc:1,sp:0,pr:1},
-  {f:"UROLIFT",cod:"UL400-AM",d:"System Implante Urológico",rs:22,sc:32,sp:12,pr:4}
+  {f:"ANASTOMAT",cod:"ZSR-DCA-12C",d:"Circuncisão 12C",rs:1,sc:0,sp:0,pr:2,ba:0},
+  {f:"ANASTOMAT",cod:"ZSR-DCA-14C",d:"Circuncisão 14C",rs:1,sc:0,sp:2,pr:2,ba:0},
+  {f:"ANASTOMAT",cod:"ZSR-DCA-16C",d:"Circuncisão 16C",rs:1,sc:0,sp:3,pr:2,ba:0},
+  {f:"ANASTOMAT",cod:"ZSR-DCA-18C",d:"Circuncisão 18C",rs:5,sc:6,sp:3,pr:4,ba:1},
+  {f:"ANASTOMAT",cod:"ZSR-DCA-22C",d:"Circuncisão 22C",rs:5,sc:10,sp:6,pr:6,ba:1},
+  {f:"ANASTOMAT",cod:"ZSR-DCA-26C",d:"Circuncisão 26C",rs:4,sc:10,sp:4,pr:6,ba:4},
+  {f:"ANASTOMAT",cod:"ZSR-DCA-30C",d:"Circuncisão 30C",rs:6,sc:10,sp:7,pr:6,ba:3},
+  {f:"ANASTOMAT",cod:"ZSR-DCA-34C",d:"Circuncisão 34C",rs:5,sc:8,sp:6,pr:6,ba:4},
+  {f:"CALIBER",cod:"VCB-10X8",d:"Membrana Reconstrutora",rs:1,sc:0,sp:1,pr:3,ba:3},
+  {f:"ELEFANT",cod:"ASP165",d:"Cânula Irrigação 35cm",rs:5,sc:0,sp:4,pr:3,ba:0},
+  {f:"ELEFANT",cod:"ASP185",d:"Cânula Irrigação 45cm",rs:251,sc:19,sp:25,pr:17,ba:5},
+  {f:"INFRA",cod:"ES2814",d:"Prótese Titan Infrapubic 14cm",rs:2,sc:1,sp:0,pr:0,ba:0},
+  {f:"INFRA",cod:"ES2816",d:"Prótese Titan Infrapubic 16cm",rs:4,sc:1,sp:0,pr:0,ba:0},
+  {f:"INFRA",cod:"ES2818",d:"Prótese Titan Infrapubic 18cm",rs:5,sc:1,sp:2,pr:1,ba:1},
+  {f:"INFRA",cod:"ES2820",d:"Prótese Titan Infrapubic 20cm",rs:0,sc:1,sp:0,pr:0,ba:0},
+  {f:"INFRA",cod:"ES2822",d:"Prótese Titan Infrapubic 22cm",rs:3,sc:1,sp:0,pr:0,ba:0},
+  {f:"INTRUM. GENESIS",cod:"39801-MCC",d:"Medidor Corpo Cavernoso",rs:4,sc:0,sp:0,pr:0,ba:0},
+  {f:"INTRUM. GENESIS",cod:"EXTENSORES",d:"Extensores Genesis",rs:1,sc:0,sp:0,pr:0,ba:0},
+  {f:"INTRUM. TITAN",cod:"AFASTADOR L.STAR",d:"Afastador Lone Star",rs:3,sc:0,sp:0,pr:0,ba:0},
+  {f:"INTRUM. TITAN",cod:"DILATADORES BROOKS",d:"Kit Dilatadores Brooks",rs:4,sc:0,sp:0,pr:0,ba:0},
+  {f:"INTRUM. TITAN",cod:"KITINSTRTITAN",d:"Kit Instrumentos Titan",rs:3,sc:1,sp:0,pr:1,ba:0},
+  {f:"INTRUM. TITAN",cod:"QB55552",d:"Furlow Inserter",rs:5,sc:0,sp:0,pr:0,ba:2},
+  {f:"INTRUM. TITAN",cod:"QB5558",d:"Kit Dilatadores Rossello",rs:2,sc:0,sp:2,pr:0,ba:0},
+  {f:"KIT DE MONTAGEM",cod:"519150",d:"Kit Montagem s/ Extensor",rs:0,sc:1,sp:1,pr:1,ba:0},
+  {f:"KIT DE MONTAGEM",cod:"519170",d:"Kit Montagem Titan",rs:9,sc:1,sp:3,pr:2,ba:1},
+  {f:"KIT DE MONTAGEM",cod:"519310",d:"Extensor Prótese Titan 0,5",rs:0,sc:1,sp:0,pr:0,ba:0},
+  {f:"MALEAVEL",cod:"519250",d:"Implante Maleável Genesis 9,5mm",rs:14,sc:2,sp:3,pr:6,ba:3},
+  {f:"MALEAVEL",cod:"519260",d:"Implante Maleável Genesis 11mm",rs:20,sc:2,sp:3,pr:6,ba:3},
+  {f:"MALEAVEL",cod:"519270",d:"Implante Maleável Genesis 13mm",rs:9,sc:1,sp:3,pr:6,ba:3},
+  {f:"NARROW INFRA",cod:"519300",d:"Narrow Kit Montagem Titan",rs:2,sc:1,sp:0,pr:0,ba:0},
+  {f:"NARROW INFRA",cod:"EN2814",d:"Prótese NB Infra 14cm",rs:0,sc:0,sp:0,pr:0,ba:0},
+  {f:"NARROW INFRA",cod:"EN2816",d:"Prótese NB Infra 16cm",rs:0,sc:0,sp:0,pr:0,ba:0},
+  {f:"NARROW INFRA",cod:"EN2818",d:"Prótese NB Infra 18cm",rs:0,sc:0,sp:0,pr:0,ba:0},
+  {f:"PENO",cod:"E17924",d:"Prótese Titan Escrotal 24cm",rs:0,sc:0,sp:0,pr:0,ba:0},
+  {f:"PENO",cod:"ES2914",d:"Prótese Titan Escrotal 14cm",rs:0,sc:1,sp:2,pr:2,ba:1},
+  {f:"PENO",cod:"ES2916",d:"Prótese Titan Escrotal 16cm",rs:2,sc:1,sp:2,pr:2,ba:1},
+  {f:"PENO",cod:"ES2918",d:"Prótese Titan Escrotal 18cm",rs:0,sc:1,sp:0,pr:0,ba:0},
+  {f:"PENO",cod:"ES2920",d:"Prótese Titan Escrotal 20cm",rs:0,sc:1,sp:2,pr:1,ba:1},
+  {f:"PENO",cod:"ES2922",d:"Prótese Titan Escrotal 22cm",rs:0,sc:1,sp:1,pr:1,ba:1},
+  {f:"RESERVATORIO",cod:"ER8075",d:"Reservatório OTR 75cc",rs:0,sc:2,sp:2,pr:2,ba:0},
+  {f:"RESERVATORIO",cod:"ER8125",d:"Reservatório OTR 125cc",rs:25,sc:2,sp:3,pr:2,ba:1},
+  {f:"UROLIFT",cod:"787.050",d:"Cesto Processamento Urolift",rs:0,sc:0,sp:0,pr:0,ba:0},
+  {f:"UROLIFT",cod:"UL-SCOPE",d:"Cistoscópio 2,9mm",rs:0,sc:0,sp:0,pr:0,ba:0},
+  {f:"UROLIFT",cod:"UL-SHEATH",d:"Bainha 20 FR",rs:0,sc:0,sp:0,pr:0,ba:0},
+  {f:"UROLIFT",cod:"UL-TRAY",d:"Cesto Processamento",rs:0,sc:0,sp:0,pr:0,ba:0},
+  {f:"UROLIFT",cod:"UL-VO",d:"Obturador Visual",rs:0,sc:0,sp:0,pr:0,ba:0},
+  {f:"UROLIFT",cod:"UL400-AM",d:"System Implante Urológico",rs:22,sc:30,sp:12,pr:4,ba:0}
 ];
 
 const familias = [...new Set(allData.map(d=>d.f))];
@@ -181,21 +177,14 @@ function render() {
     return a.d.localeCompare(b.d);
   });
   const showAll = selEst === 'ALL';
-  const states = showAll ? ['rs','sc','sp','pr'] : [selEst];
-  const sLabels = {rs:'RS',sc:'SC',sp:'SP',pr:'PR'};
-  const sColors = {rs:'#3266ad',sc:'#1D9E75',sp:'#D85A30',pr:'#7F77DD'};
+  const states = showAll ? ['rs','sc','sp','pr','ba'] : [selEst];
+  const sLabels = {rs:'RS',sc:'SC',sp:'SP',pr:'PR',ba:'BA'};
+  const sColors = {rs:'#3266ad',sc:'#1D9E75',sp:'#D85A30',pr:'#7F77DD',ba:'#E6A817'};
 
   if (hideZero) {
-    data = showAll ? data.filter(d=>(d.rs+d.sc+d.sp+d.pr)>0) : data.filter(d=>d[selEst]>0);
+    data = showAll ? data.filter(d=>(d.rs+d.sc+d.sp+d.pr+d.ba)>0) : data.filter(d=>d[selEst]>0);
   }
 
-  // Summary cards
-  const totByState = {rs:0,sc:0,sp:0,pr:0};
-  data.forEach(d => { totByState.rs+=d.rs; totByState.sc+=d.sc; totByState.sp+=d.sp; totByState.pr+=d.pr; });
-  const sumHTML = states.map(s =>
-    '<div class="card"><div class="card-label">'+sLabels[s]+'</div><div class="card-value" style="color:'+sColors[s]+'">'+totByState[s]+'</div></div>'
-  ).join('') + '<div class="card"><div class="card-label">Total</div><div class="card-value">'+(states.reduce((s,k)=>s+totByState[k],0))+'</div></div>';
-  document.getElementById('summary').innerHTML = sumHTML;
   document.getElementById('countLabel').textContent = data.length + ' produtos';
 
   let currentFam = '';
