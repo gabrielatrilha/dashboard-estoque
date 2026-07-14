@@ -227,6 +227,7 @@ function checkPwd() {
     document.getElementById('pwd').value = '';
   }
 }
+if(localStorage.getItem('mi_auth')==='ok'){document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';}
 </script>
 </body>
 </html>
