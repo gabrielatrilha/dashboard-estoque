@@ -7,15 +7,6 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f6f8; color: #1a1a1a; padding: 24px; }
-#login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; }
-#login-screen h2 { font-size: 20px; color: #1f4e79; margin-bottom: 6px; }
-#login-screen p { font-size: 13px; color: #888; margin-bottom: 20px; }
-#login-screen input { padding: 10px 16px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; width: 260px; margin-bottom: 12px; font-family: inherit; }
-#login-screen input:focus { outline: none; border-color: #1f4e79; }
-#login-screen button { padding: 10px 24px; font-size: 14px; background: #1f4e79; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; }
-#login-screen button:hover { background: #163a5c; }
-#login-screen .error { color: #d32f2f; font-size: 12px; margin-top: 8px; display: none; }
-#app { display: none; }
 h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; color: #1f4e79; }
 .subtitle { font-size: 13px; color: #888; margin-bottom: 20px; }
 .section-label { font-size: 12px; color: #777; margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -47,14 +38,6 @@ tfoot td.num { text-align: right; }
 </style>
 </head>
 <body>
-
-<div id="login-screen">
-  <h2>Estoque Emultec</h2>
-  <p>Digite a senha para acessar o relatório</p>
-  <input type="password" id="pwd" placeholder="Senha" onkeydown="if(event.key==='Enter')checkPwd()">
-  <button onclick="checkPwd()">Entrar</button>
-  <span class="error" id="pwd-error">Senha incorreta</span>
-</div>
 
 <div id="app">
 <h1>Relatório de Estoque por Estado</h1>
@@ -217,16 +200,6 @@ render();
 </div>
 
 <script>
-function checkPwd() {
-  var p = document.getElementById('pwd').value;
-  if (btoa(p) === 'bWFnbnVtQGVzdG9xdWU=') {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-  } else {
-    document.getElementById('pwd-error').style.display = 'block';
-    document.getElementById('pwd').value = '';
-  }
-}
 </script>
 </body>
 </html>
