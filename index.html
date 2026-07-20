@@ -3,10 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Estoque Emultec por Estado — 16/07/2026</title>
+<title>Estoque Emultec por Estado — 20/07/2026</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f6f8; color: #1a1a1a; padding: 24px; }
+#login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; }
+#login-screen h2 { font-size: 20px; color: #1f4e79; margin-bottom: 6px; }
+#login-screen p { font-size: 13px; color: #888; margin-bottom: 20px; }
+#login-screen input { padding: 10px 16px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; width: 260px; margin-bottom: 12px; font-family: inherit; }
+#login-screen input:focus { outline: none; border-color: #1f4e79; }
+#login-screen button { padding: 10px 24px; font-size: 14px; background: #1f4e79; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; }
+#login-screen button:hover { background: #163a5c; }
+#login-screen .error { color: #d32f2f; font-size: 12px; margin-top: 8px; display: none; }
+#app { display: none; }
 h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; color: #1f4e79; }
 .subtitle { font-size: 13px; color: #888; margin-bottom: 20px; }
 .section-label { font-size: 12px; color: #777; margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -28,178 +37,137 @@ tbody td.cod { font-family: 'Consolas', 'Courier New', monospace; font-size: 11p
 tbody tr.fam-start td { border-top: 2px solid #d0dbe6; }
 tbody tr:hover td { background: #f0f5fa; }
 tfoot td { background: #1f4e79; color: #fff; font-weight: 600; font-size: 12px; padding: 10px 8px; }
-tfoot td.num { text-align: right; }
-.dash { color: #ccc; }
-@media print {
-  body { padding: 10px; background: #fff; }
-  .btn-group, .controls, .no-print { display: none !important; }
-  table { box-shadow: none; }
+tfoot td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.zero { color: #ccc; }
+.low { background: #fff3cd; }
+.empty { background: #ffdbdb; }
+.hidden { display: none; }
+@media (max-width: 600px) {
+  body { padding: 12px; }
+  thead th, tbody td, tfoot td { padding: 6px 4px; font-size: 11px; }
 }
 </style>
 </head>
 <body>
-
+<div id="login-screen">
+<h2>Reatório de Estoque</h2>
+<p>Digite a senha para acessar</p>
+<input type="password" id="senha" placeholder="Senha" autocomplete="off">
+<button onclick="doLogin()">Entrar</button>
+<div class="error" id="err">Senha incorreta</div>
+</div>
 <div id="app">
-<h1>Relatório de Estoque por Estado</h1>
-<p class="subtitle">Fonte: bi.emultec.com.br — estoque_analítico (Locais) — 16/07/2026</p>
-
-
-<p class="section-label">Estado</p>
-<div class="btn-group" id="estBtns">
-  <button class="btn active" data-val="ALL">Todos</button>
-  <button class="btn" data-val="rs"><span class="dot" style="background:#3266ad"></span>RS (C61)</button>
-  <button class="btn" data-val="sc"><span class="dot" style="background:#1D9E75"></span>SC (C67)</button>
-  <button class="btn" data-val="sp"><span class="dot" style="background:#D85A30"></span>SP (C63)</button>
-  <button class="btn" data-val="pr"><span class="dot" style="background:#7F77DD"></span>PR (C64)</button>
-  <button class="btn" data-val="ba"><span class="dot" style="background:#E6A817"></span>BA (C68)</button>
+<h1>Estoque Emultec por Estado</h1>
+<div class="subtitle">Atualizado em 20/07/2026</div>
+<div class="section-label">Família</div>
+<div class="btn-group" id="famBtns"></div>
+<div class="section-label">Estado</div>
+<div class="btn-group" id="ufBtns"></div>
+<div class="controls">
+<label><input type="checkbox" id="hideZero"> Ocultar zerados</label>
+<span class="count" id="rowCount"></span>
 </div>
-
-<p class="section-label">Família</p>
-<div class="btn-group" id="famBtns">
-  <button class="btn active" data-val="ALL">Todas</button>
+<table>
+<thead><tr><th>Produto</th><th>Código</th><th>Descrição</th><th class="num">RS</th><th class="num">SC</th><th class="num">SP</th><th class="num">PR</th><th class="num">BA</th></tr></thead>
+<tbody id="tbody"></tbody>
+<tfoot id="tfoot"></tfoot>
+</table>
 </div>
-
-<div class="controls no-print">
-  <label><input type="checkbox" id="hideZero" checked> Ocultar zerados</label>
-  <span class="count" id="countLabel"></span>
-</div>
-
-<div id="tableWrap"></div>
-
 <script>
 const allData = [
-  {f:"ANASTOMAT",cod:"ZSR-DCA-12C",d:"Circuncisão 12C",rs:1,sc:0,sp:0,pr:2,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-14C",d:"Circuncisão 14C",rs:1,sc:0,sp:2,pr:2,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-16C",d:"Circuncisão 16C",rs:1,sc:0,sp:2,pr:2,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-18C",d:"Circuncisão 18C",rs:3,sc:6,sp:2,pr:6,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-22C",d:"Circuncisão 22C",rs:7,sc:10,sp:6,pr:9,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-26C",d:"Circuncisão 26C",rs:6,sc:10,sp:5,pr:10,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-30C",d:"Circuncisão 30C",rs:2,sc:9,sp:5,pr:10,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-34C",d:"Circuncisão 34C",rs:6,sc:10,sp:6,pr:9,ba:0},
-  {f:"CALIBER",cod:"VCB-10X8",d:"Membrana Reconstrutora",rs:7,sc:0,sp:3,pr:3,ba:0},
-  {f:"ELEFANT",cod:"ASP165",d:"Cânula Irrigação 35cm",rs:5,sc:2,sp:4,pr:3,ba:0},
-  {f:"ELEFANT",cod:"ASP185",d:"Cânula Irrigação 45cm",rs:152,sc:17,sp:23,pr:17,ba:0},
-  {f:"INFRA",cod:"ES2814",d:"Prótese Titan Infrapubic 14cm",rs:2,sc:0,sp:0,pr:0,ba:0},
-  {f:"INFRA",cod:"ES2816",d:"Prótese Titan Infrapubic 16cm",rs:4,sc:0,sp:0,pr:0,ba:0},
-  {f:"INFRA",cod:"ES2818",d:"Prótese Titan Infrapubic 18cm",rs:6,sc:0,sp:1,pr:3,ba:0},
-  {f:"INFRA",cod:"ES2820",d:"Prótese Titan Infrapubic 20cm",rs:4,sc:0,sp:0,pr:0,ba:0},
-  {f:"INFRA",cod:"ES2822",d:"Prótese Titan Infrapubic 22cm",rs:4,sc:0,sp:0,pr:0,ba:0},
-  {f:"INTRUM. GENESIS",cod:"39801-MCC",d:"Medidor Corpo Cavernoso",rs:4,sc:0,sp:0,pr:0,ba:0},
-  {f:"INTRUM. GENESIS",cod:"EXTENSORES",d:"Extensores Genesis",rs:1,sc:0,sp:0,pr:0,ba:0},
-  {f:"INTRUM. TITAN",cod:"AFASTADOR L.STAR",d:"Afastador Lone Star",rs:3,sc:0,sp:0,pr:0,ba:1},
-  {f:"INTRUM. TITAN",cod:"DILATADORES BROOKS",d:"Kit Dilatadores Brooks",rs:0,sc:1,sp:0,pr:1,ba:1},
-  {f:"INTRUM. TITAN",cod:"KITINSTRTITAN",d:"Kit Instrumentos Titan",rs:3,sc:1,sp:0,pr:1,ba:0},
-  {f:"INTRUM. TITAN",cod:"QB55552",d:"Furlow Inserter",rs:5,sc:2,sp:0,pr:0,ba:0},
-  {f:"INTRUM. TITAN",cod:"QB5558",d:"Kit Dilatadores Rossello",rs:2,sc:0,sp:2,pr:0,ba:0},
-  {f:"KIT DE MONTAGEM",cod:"519150",d:"Kit Montagem s/ Extensor",rs:0,sc:0,sp:1,pr:1,ba:0},
-  {f:"KIT DE MONTAGEM",cod:"519170",d:"Kit Montagem Titan",rs:3,sc:0,sp:3,pr:3,ba:0},
-  {f:"KIT DE MONTAGEM",cod:"519310",d:"Extensor Prótese Titan 0,5",rs:6,sc:0,sp:1,pr:1,ba:0},
-  {f:"MALEAVEL",cod:"519250",d:"Implante Maleável Genesis 9,5mm",rs:8,sc:3,sp:3,pr:7,ba:0},
-  {f:"MALEAVEL",cod:"519260",d:"Implante Maleável Genesis 11mm",rs:12,sc:1,sp:3,pr:7,ba:0},
-  {f:"MALEAVEL",cod:"519270",d:"Implante Maleável Genesis 13mm",rs:13,sc:2,sp:3,pr:6,ba:0},
-  {f:"NARROW INFRA",cod:"519300",d:"Narrow Kit Montagem Titan",rs:2,sc:0,sp:0,pr:1,ba:0},
-  {f:"NARROW INFRA",cod:"EN2814",d:"Prótese NB Infra 14cm",rs:1,sc:0,sp:0,pr:0,ba:0},
-  {f:"NARROW INFRA",cod:"EN2816",d:"Prótese NB Infra 16cm",rs:1,sc:0,sp:0,pr:0,ba:0},
-  {f:"NARROW INFRA",cod:"EN2818",d:"Prótese NB Infra 18cm",rs:1,sc:0,sp:0,pr:0,ba:0},
-  {f:"NARROW PENO",cod:"EN2911",d:"Prótese NB Escr 11cm",rs:0,sc:0,sp:0,pr:1,ba:0},
-  {f:"NARROW PENO",cod:"EN2916",d:"Prótese NB Escr 16cm",rs:0,sc:0,sp:0,pr:1,ba:0},
-  {f:"NARROW PENO",cod:"EN2918",d:"Prótese NB Escr 18cm",rs:0,sc:0,sp:0,pr:1,ba:0},
-  {f:"PENO",cod:"E17924",d:"Prótese Titan Escrotal 24cm",rs:1,sc:0,sp:0,pr:1,ba:0},
-  {f:"PENO",cod:"ES2914",d:"Prótese Titan Escrotal 14cm",rs:1,sc:0,sp:2,pr:3,ba:0},
-  {f:"PENO",cod:"ES2916",d:"Prótese Titan Escrotal 16cm",rs:3,sc:0,sp:2,pr:3,ba:0},
-  {f:"PENO",cod:"ES2918",d:"Prótese Titan Escrotal 18cm",rs:1,sc:0,sp:2,pr:1,ba:0},
-  {f:"PENO",cod:"ES2920",d:"Prótese Titan Escrotal 20cm",rs:2,sc:0,sp:2,pr:3,ba:0},
-  {f:"PENO",cod:"ES2922",d:"Prótese Titan Escrotal 22cm",rs:1,sc:0,sp:2,pr:1,ba:0},
-  {f:"RESERVATORIO",cod:"ER8075",d:"Reservatório OTR 75cc",rs:2,sc:0,sp:2,pr:3,ba:0},
-  {f:"RESERVATORIO",cod:"ER8125",d:"Reservatório OTR 125cc",rs:23,sc:0,sp:3,pr:3,ba:0},
-  {f:"UROLIFT",cod:"UL400-AM",d:"System Implante Urológico",rs:79,sc:26,sp:20,pr:20,ba:0}
-];
-
-const familias = [...new Set(allData.map(d=>d.f))];
-const famWrap = document.getElementById('famBtns');
-familias.forEach(f => {
-  const b = document.createElement('button');
-  b.className = 'btn';
-  b.dataset.val = f;
-  b.textContent = f;
-  famWrap.appendChild(b);
-});
-
-let selEst = 'ALL', selFam = 'ALL';
-
-document.getElementById('estBtns').addEventListener('click', e => {
-  const btn = e.target.closest('.btn');
-  if (!btn) return;
-  selEst = btn.dataset.val;
-  document.querySelectorAll('#estBtns .btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  render();
-});
-
-document.getElementById('famBtns').addEventListener('click', e => {
-  const btn = e.target.closest('.btn');
-  if (!btn) return;
-  selFam = btn.dataset.val;
-  document.querySelectorAll('#famBtns .btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  render();
-});
-
-document.getElementById('hideZero').addEventListener('change', render);
-
-function render() {
-  const hideZero = document.getElementById('hideZero').checked;
-  let data = selFam === 'ALL' ? [...allData] : allData.filter(d=>d.f===selFam);
-  data.sort((a,b) => {
-    if (a.f !== b.f) return a.f.localeCompare(b.f);
-    const na = parseFloat((a.d.match(/(\d+[\.,]?\d*)\s*(cm|C|mm)?/i)||[])[1]) || 0;
-    const nb = parseFloat((b.d.match(/(\d+[\.,]?\d*)\s*(cm|C|mm)?/i)||[])[1]) || 0;
-    if (na !== nb) return na - nb;
-    return a.d.localeCompare(b.d);
-  });
-  const showAll = selEst === 'ALL';
-  const states = showAll ? ['rs','sc','sp','pr','ba'] : [selEst];
-  const sLabels = {rs:'RS',sc:'SC',sp:'SP',pr:'PR',ba:'BA'};
-  const sColors = {rs:'#3266ad',sc:'#1D9E75',sp:'#D85A30',pr:'#7F77DD',ba:'#E6A817'};
-
-  if (hideZero) {
-    data = showAll ? data.filter(d=>(d.rs+d.sc+d.sp+d.pr+d.ba)>0) : data.filter(d=>d[selEst]>0);
-  }
-
-  document.getElementById('countLabel').textContent = data.length + ' produtos';
-
-  let currentFam = '';
-  let html = '<table><thead><tr><th>Família</th><th>Código</th><th>Descrição</th>';
-  states.forEach(s => { html += '<th class="num" style="min-width:60px;">'+sLabels[s]+'</th>'; });
-  html += '<th class="num">Total</th></tr></thead><tbody>';
-
-  const totals = {}; states.forEach(s=>totals[s]=0); let gt=0;
-
-  data.forEach(r => {
-    const t = states.reduce((sum,s)=>sum+r[s],0);
-    states.forEach(s=>totals[s]+=r[s]); gt+=t;
-    const nf = r.f!==currentFam; if(nf) currentFam=r.f;
-    html += '<tr class="'+(nf?'fam-start':'')+'">';
-    html += '<td class="fam">'+(nf?r.f:'')+'</td>';
-    html += '<td class="cod">'+r.cod+'</td>';
-    html += '<td>'+r.d+'</td>';
-    states.forEach(s => { html += '<td class="num">'+(r[s]||'<span class="dash">-</span>')+'</td>'; });
-    html += '<td class="num" style="font-weight:600;">'+t+'</td></tr>';
-  });
-
-  html += '</tbody><tfoot><tr><td colspan="3">Total</td>';
-  states.forEach(s => { html += '<td class="num">'+totals[s]+'</td>'; });
-  html += '<td class="num">'+gt+'</td></tr></tfoot></table>';
-
-  if (!data.length) html = '<p style="padding:20px;color:#aaa;">Nenhum produto com saldo para este filtro.</p>';
-  document.getElementById('tableWrap').innerHTML = html;
-}
-
-render();
-</script>
-</div>
-
-<script>
-</script>
-</body>
-</html>
+{f:"ANASTOMAT",cod:"ZSR-DCA-12C",d:"Circuncisão 12C",rs:1,sc:0,sp:0,pr:2,ba:0},
+{f:"ANASTOMAT",cod:"ZSR-DCA-14C",d:"Circuncisão 14C",rs:1,sc:0,sp:2,pr:2,ba:0},
+{f:"ANASTOMAT",cod:"ZSR-DCA-16C",d:"Circuncisão 16C",rs:3,sc:0,sp:2,pr:2,ba:0},
+{f:"ANASTOMAT",cod:"ZSR-DCA-18C",d:"Circuncisão 18C",rs:8,sc:6,sp:2,pr:6,ba:0},
+{f:"ANASTOMAT",cod:"ZSR-DCA-22C",d:"Circuncisão 22C",rs:11,sc:10,sp:6,pr:10,ba:0},
+{f:"ANASTOMAT",cod:"ZSR-DCA-26C",d:"Circuncisão 26C",rs:3,sc:10,sp:5,pr:11,ba:0},
+{f:"ANASTOMAT",cod:"ZSR-DCA-30C",d:"Circuncisão 30C",rs:6,sc:8,sp:4,pr:10,ba:0},
+{f:"ANASTOMAT",cod:"ZSR-DCA-34C",d:"Circuncisão 34C",rs:15,sc:10,sp:6,pr:9,ba:0},
+{f:"CALIBER",cod:"VCB-10X8",d:"Membrana Reconstrutora",rs:7,sc:0,sp:3,pr:3,ba:0},
+{f:"ELEFANT",cod:"ASP165",d:"Cânula Irrigação 35cm",rs:5,sc:2,sp:4,pr:3,ba:0},
+{f:"ELEFANT",cod:"ASP185",d:"Cânula Irrigação 45cm",rs:152,sc:17,sp:23,pr:17,ba:0},
+{f:"INFRA",cod:"ES2814",d:"Prótese Titan Infrapubic 14cm",rr:2,sc:0,sp:0,pr:0,ba:0},
+{f:"INFRA",cod:"ES2816",d:"Prótese Titan Infrapubic 16cm",rs:4,sc:0,sp:0,pr:0,ba:0},
+{f:"INFRA",cod:"ES2818",d:"Prótese Titan Infrapubic 18cm",rs:6,sc:0,sp:1,pr:3,ba:0},
+{f:"INFRA",cod:"ES2820",d:"Prótese Titan Infrapubic 20cm",rs:4,sc:0,sp:0,pr:0,ba:0},
+{f:"INFRA",cod:"ES2822",d:"Prótese Titan Infrapubic 22cm",rs:4,sc:0,sp:0,pr:0,ba:0},
+{f:"INTRUM. GENESIS",cod:"39801-MCC",d:"Medidor Corpo Cavernoso",rs:4,sc:0,sp:0,pr:0,ba:0},
+{f:"INTRUM. GENESIS",cod:"EXTENSORES",d:"Extensores Genesis",rs:1,sc:0,sp:0,pr:0,ba:0},
+{f:"INTRUM. TITAN",cod:"AFASTADOR L.STAR",d:"Afastador Lone Star",rs:3,sc:0,sp:0,pr:0,ba:1},
+{f:"INTRUM. TITAN",cod:"DILATADORES BROOKS",d:"Kit Dilatadores Brooks",rs:0,sc:1,sp:0,pr:1,ba:1},
+{f:"INTRUM. TITAN",cod:"KITINSTRTITAN",d:"Kit Instrumentos Titan",rs:3,sc:1,sp:0,pr:1,ba:0},
+{f:"INTRUM. TITAN",cod:"QB55552",d:"Furlow Inserter",rs:3,sc:2,sp:0,pr:0,ba:0},
+{f:"INTRUM. TITAN",cod:"QB5558",d:"Kit Dilatadores Rossello",rs:2,sc:0,sp:1,pr:0,ba:0},
+{f:"KIT DE MONTAGEM",cod:"519150",d:"Kit Montagem s/ Extensor",rs:0,sc:0,sp:1,pr:1,ba:0},
+{f:"KIT DE MONTAGEM",cod:"519170",d:"Kit Montagem Titan",rs:2,sc:0,sp:2,pr:3,ba:0},
+{f:"KIT DE MONTAGEM",cod:"519310",d:"Extensor Prótese Titan 0,1",rs:6,sc:0,sp:1,pr:1,ba:0},
+{f:"MALEAVEL",cod:"519250",d:"Implante Maleável Genesis 9,5mm",rs:9,sc:3,sp:2,pr:7,ba:0},
+{f:"MALEAVEL",cod:"519260",d:"Implante Maleável Genesis 11mm",rs:12,sc:1,sp:2,pr:7,ba:0},
+{f:"MALEAVEL",cod:"519270",d:"Implante Maleável Genesis 13mm",rs:14,sc:2,sp:2,pr:6,ba:0},
+{f:"NARROW INFRA",cod:"519300",d:"Narrow Kit Montagem Titan",rs:2,sc:0,sp:0,pr:1,ba:0},
+{f:"NARROW INFRA",cod:"EN2814",d:"Prótese NB Infra 14cm",rs:1,sc:0,sp:0,pr:0,ba:0},
+{f:"NARROW INFRA",cod:"EN2816",d:"Prótese NB Infra 16cm",rs:1,sc:0,sp:0,pr:0,ba:0},
+{f:"NARROW INFRA",cod:"EN2818",d:"Prótese NB Infra 18cm",rs:1,sc:0,sp:0,pr:0,ba:0},
+{f:"NARROW PENO",cod:"EN2911",d:"Prótese NB Escr 11cm",rs:0,sc:0,sp:0,pr:1,ba:0},
+{f:"NARROW PENO",cod:"EN2916",d:"Prótese NB Escr 16cm",rs:0,sc:0,sp:0,pr:1,ba:0},
+{f:"NARROW PENO",cod:"EN2918",d:"Prótese NB Escr 18cm",rs:0,sc:0,sp:0,pr:1,ba:0},
+{f:"PENO",cod:"E17924",d:"Prótese Titan Escrotal 24cm",rs:1,sc:0,sp:0,pr:1,ba:0},
+{f:"PENO",cod:"ES2914",d:"Prótese Titan Escrotal 14cm",rs:0,sc:0,sp:2,pr:3,ba:0},
+{f:"PENO",cod:"ES2916",d:"Prótese Titan Escrotal 16cm",rs:2,sc:0,sp:2,pr:3,ba:0},
+{f:"PENO",cod:"ES2918",d:"Prótese Titan Escrotal 18cm",rs:0,sc:0,sp:2,pr:1,ba:0},
+{f:"PENO",cod:"ES2920",d:"Prótese Titan Escrotal 20cm",rs:2,sc:0,sp:1,pr:3,ba:0},
+{f:"PENO",cod:"ES2922",d:"Prótese Titan Escrotal 22cm",rs:1,sc:0,sp:2,pr:2,ba:0},
+{f:"RESERVATORIO",cod:"ER8075",d:"Reservatório OTR 75cc",rs:1,sc:0,sp:2,pr:��N�K�َ���T�T��UԒSȋ����T�L�H����\�\��]0�ܚ[���L�X�ȋ�Ό���Ό�������N�K�َ��T��Q������S
+PSH����\�[H[\[�H\��0���X�ȋ�΍NK�Ό�������M��N�B�N��ۜ��[P��ܜ�H�N�ۜ�[]HH���M�XM��	�ٌ�L���	��͘�،��	��LMY
+NI�	��NX�NI�	��NM��L	�	�ٙ��M�I�	�،
+�XM��	��M��̉�	��Y�M�I�	���Y�L	�	�ٙ�N	�	��X̍،	�	��	�N]OL[]K��ܑXX�
+�O��Y�Y�[P��ܜ�܋��JH�[P��ܜ�܋��HH[]V�J��	H[]K�[��N�JN�]�[�[HH�[�[Q�H�[�ۜ��[\�Hˋ���]��]
+[]K�X\
+�O����JWN�ۜ�Y��H�ܜ��	����	��	�	���	ؘI�N�ۜ�Y�X�[HܜΉԔ���Ή��������	�������N�АI�N��[��[ۈ�Z[���
+H�ۜ���H��[Y[���][[Y[��RY
+	٘[P����N���[��\�SH	��]ۈ�\��H�����\�[�[O��X�]�IΉ��J�Ȉۘ�X��H��ј[J�[
+H�����؝]ۏ���[\˙�ܑXX�
+�O����[��\�S
+�H�]ۈ�\��H�����[�[OOOY���X�]�IΉ��H�ۘ�X��H��ј[J	�ٟI�H���[��\��H����[OH��X��ܛ�[��٘[P��ܜ�ٗ_H����[��ٟO؝]ۏ�JN�ۜ�P�H��[Y[���][[Y[��RY
+	�Y�����NP��[��\�SH	��]ۈ�\��H�����\�[Q���X�]�IΉ��J�Ȉۘ�X��H���Q��[
+H�����؝]ۏ��Y�˙�ܑXX�
+HO�P��[��\�S
+�H�]ۈ�\��H�����[Q�OO]O��X�]�IΉ��H�ۘ�X��H���Q�	��_I�H���Y�X�[�W_O؝]ۏ�JNB���[��[ۈ�ј[J�H��[�[HH�[�[OOOY���[����Z[���
+N��[�\�
+N�B��[��[ۈ��Q�JH��[Q�H�[Q�OO]H��[�N��Z[���
+N��[�\�
+N�B���[��[ۈ�[�\�
+H�ۜ��H��[Y[���][[Y[��RY
+	�YV�\���K��X��Y]]HH[]NY�
+�[�[JH]HH]K��[\��O����OOH�[�[JNY�
+�HY�
+�[Q�H]HH]K��[\��O����[Q�H�
+N[�H]HH]K��[\��O�
+����܋���܋��
+܋��܋��JH�
+NB��ۜ��H��[Y[���][[Y[��RY
+	���I�N��[��\�SH	��]�]��H�[�[�HܜΌ�Ό�����N�N]K��ܑXX�
+�O��ۜ��H���OOH�]���	��[K\�\�	��	���]��H����ۜ����H�[Q����\��H��[Iܖ��[Q�OOOL���\��Ή��Iܖ��[Q�OOOL��[\IΜ���[Q�OL�����Ή��H��ܖ��[Q�_O����Y�˛X\
+HO��\��H��[Iܖ�WOOOL���\��Ή��Iܖ�WOOOL��[\IΜ��WOL�����Ή��H��ܖ�W_O��
+K���[�	��N��[��\�S
+�H��\��H���H���\��H��[H��[OH���܎�٘[P��ܜ�܋��_H��܋��O���\��H�����܋���O���܋�O������O���Y�˙�ܑXX�
+HO��[��WH
+�H��WJNJN�ۜ��H��[Y[���][[Y[��RY
+	����	�N�ۜ����H�[Q����\��H��[H����[���[Q�_O����Y�˛X\
+HO��\��H��[H����[��W_O��
+K���[�	��N��[��\�SH�����[�H�ȏ��[������O�����[Y[���][[Y[��RY
+	ܛ����[�	�K�^�۝[�H]K�[��
+�	�][���B���[��[ۈ���[�
+H�ۜ�H��[Y[���][[Y[��RY
+	��[�I�K��[YNY�
+��J
+HOOH	ؕћ����Q՞��^�OI�H��[Y[���][[Y[��RY
+	���[�\�ܙY[��K��[K�\�^HH	ۛۙI���[Y[���][[Y[��RY
+	�\	�K��[K�\�^HH	؛�����Z[���
+N�[�\�
+NH[�H��[Y[���][[Y[��RY
+	�\���K��[K�\�^HH	؛����B�B���[Y[���][[Y[��RY
+	��[�I�K�Y]�[�\�[�\�	��^Y�ۉ�HO��Y�
+K��^OOOI�[�\��H���[�
+N�JN��[Y[���][[Y[��RY
+	�YV�\���K�Y]�[�\�[�\�	��[��I��[�\�N��ܚ\��؛�O���[
