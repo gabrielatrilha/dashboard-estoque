@@ -49,6 +49,10 @@ tfoot td.num { text-align: right; font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
+<script>
+if(localStorage.getItem("mi_auth")==="ok"){document.addEventListener("DOMContentLoaded",function(){document.getElementById("login-screen").style.display="none";document.getElementById("app").style.display="block";});}
+function doLogin(){var p=document.getElementById("senha").value;if(btoa(p)==="TWFnbnVtMTE0MA=="){localStorage.setItem("mi_auth","ok");document.getElementById("login-screen").style.display="none";document.getElementById("app").style.display="block";}else{var e=document.getElementById("err");e.style.display="block";setTimeout(function(){e.style.display="none"},2000);}}
+</script>
 <div id="login-screen">
 <h2>Reatório de Estoque</h2>
 <p>Digite a senha para acessar</p>
@@ -75,9 +79,6 @@ tfoot td.num { text-align: right; font-variant-numeric: tabular-nums; }
 </table>
 </div>
 <script>
-if(localStorage.getItem('mi_auth')==='ok'){document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';}
-function doLogin(){var p=document.getElementById('senha').value;if(btoa(p)==='TWFnbnVtMTE0MA=='){localStorage.setItem('mi_auth','ok');document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';}else{var e=document.getElementById('err');e.style.display='block';setTimeout(function(){e.style.display='none'},2000);}}
-
 const allData = [
 {f:"ANASTOMAT",cod:"ZSR-DCA-12C",d:"Circuncisão 12C",rs:1,sc:0,sp:0,pr:2,ba:0},
 {f:"ANASTOMAT",cod:"ZSR-DCA-14C",d:"Circuncisão 14C",rs:1,sc:0,sp:2,pr:2,ba:0},
