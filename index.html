@@ -57,6 +57,7 @@ tfoot td.num { text-align: right; font-variant-numeric: tabular-nums; }
 <div class="error" id="err">Senha incorreta</div>
 </div>
 <div id="app">
+<a href="https://gabrielatrilha.github.io/MagnumImport/" style="color:#0dd;text-decoration:none;font-size:13px;display:inline-block;margin-bottom:10px">&larr; Portal</a>
 <h1>Estoque Emultec por Estado</h1>
 <div class="subtitle">Atualizado em 20/07/2026</div>
 <div class="section-label">Família</div>
@@ -74,6 +75,9 @@ tfoot td.num { text-align: right; font-variant-numeric: tabular-nums; }
 </table>
 </div>
 <script>
+if(localStorage.getItem('mi_auth')==='ok'){document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';}
+function doLogin(){var p=document.getElementById('senha').value;if(btoa(p)==='TWFnbnVtMTE0MA=='){localStorage.setItem('mi_auth','ok');document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';}else{var e=document.getElementById('err');e.style.display='block';setTimeout(function(){e.style.display='none'},2000);}}
+
 const allData = [
 {f:"ANASTOMAT",cod:"ZSR-DCA-12C",d:"Circuncisão 12C",rs:1,sc:0,sp:0,pr:2,ba:0},
 {f:"ANASTOMAT",cod:"ZSR-DCA-14C",d:"Circuncisão 14C",rs:1,sc:0,sp:2,pr:2,ba:0},
