@@ -47,37 +47,10 @@ tfoot td.num { text-align: right; font-variant-numeric: tabular-nums; }
   thead th, tbody td, tfoot td { padding: 6px 4px; font-size: 11px; }
 }
 </style>
+
+<script>if(localStorage.getItem("mi_auth")==="ok")document.write("<style>#login-screen{display:none!important}#app{display:block!important}</style>");function doLogin(){var p=document.getElementById("senha").value;if(btoa(p)==="TWFnbnVtMTE0MA=="){localStorage.setItem("mi_auth","ok");document.getElementById("login-screen").style.display="none";document.getElementById("app").style.display="block";}else{var e=document.getElementById("err");e.style.display="block";setTimeout(function(){e.style.display="none"},2000);}}</script>
 </head>
 <body>
-<script>
-if(localStorage.getItem("mi_auth")==="ok"){document.addEventListener("DOMContentLoaded",function(){document.getElementById("login-screen").style.display="none";document.getElementById("app").style.display="block";});}
-function doLogin(){var p=document.getElementById("senha").value;if(btoa(p)==="TWFnbnVtMTE0MA=="){localStorage.setItem("mi_auth","ok");document.getElementById("login-screen").style.display="none";document.getElementById("app").style.display="block";}else{var e=document.getElementById("err");e.style.display="block";setTimeout(function(){e.style.display="none"},2000);}}
-</script>
-<div id="login-screen">
-<h2>Reatório de Estoque</h2>
-<p>Digite a senha para acessar</p>
-<input type="password" id="senha" placeholder="Senha" autocomplete="off">
-<button onclick="doLogin()">Entrar</button>
-<div class="error" id="err">Senha incorreta</div>
-</div>
-<div id="app">
-<a href="https://gabrielatrilha.github.io/MagnumImport/" style="color:#0dd;text-decoration:none;font-size:13px;display:inline-block;margin-bottom:10px">&larr; Portal</a>
-<h1>Estoque Emultec por Estado</h1>
-<div class="subtitle">Atualizado em 20/07/2026</div>
-<div class="section-label">Família</div>
-<div class="btn-group" id="famBtns"></div>
-<div class="section-label">Estado</div>
-<div class="btn-group" id="ufBtns"></div>
-<div class="controls">
-<label><input type="checkbox" id="hideZero"> Ocultar zerados</label>
-<span class="count" id="rowCount"></span>
-</div>
-<table>
-<thead><tr><th>Produto</th><th>Código</th><th>Descrição</th><th class="num">RS</th><th class="num">SC</th><th class="num">SP</th><th class="num">PR</th><th class="num">BA</th></tr></thead>
-<tbody id="tbody"></tbody>
-<tfoot id="tfoot"></tfoot>
-</table>
-</div>
 <script>
 const allData = [
 {f:"ANASTOMAT",cod:"ZSR-DCA-12C",d:"Circuncisão 12C",rs:1,sc:0,sp:0,pr:2,ba:0},
