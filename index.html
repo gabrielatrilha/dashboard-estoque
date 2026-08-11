@@ -217,7 +217,7 @@ render();
 </div>
 
 <script>
-function checkPwd() {
+if(localStorage.getItem('mi_auth')){document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';}function checkPwd() {
   var p = document.getElementById('pwd').value;
   if (btoa(p) === 'bWFnbnVtQGVzdG9xdWU=') {
     document.getElementById('login-screen').style.display = 'none';
