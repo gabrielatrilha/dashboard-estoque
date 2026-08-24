@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Estoque Emultec por Estado — 21/08/2026</title>
+<title>Estoque Emultec por Estado — 24/08/2026</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', Arial, sanhs-serif; background: #f5f6f8; color: #1a1a1a; padding: 24px; }
@@ -58,7 +58,7 @@ tfoot td.num { text-align: right; }
 
 <div id="app">
 <a href="https://gabrielatrilha.github.io/MagnumImport/" style="color:#1f4e79;text-decoration:none;font-size:13px;font-weight:600">← Portal</a>    <h1>Relatório de Estoque por Estado</h1>
-<p class="subtitle">Fonte: bi.emultec.com.br — estoque_analítico (Locais) — 21/08/2026</p>
+<p class="subtitle">Fonte: bi.emultec.com.br — estoque_analítico (Locais) — 24/08/2026</p>
 
 
 <p class="section-label">Estado</p>
@@ -88,14 +88,14 @@ const allData = [
   {f:"ANASTOMAT",cod:"ZSR-DCA-12C",d:"Circuncisão 12C",rs:0,sc:0,sp:1,pr:2,ba:0},
   {f:"ANASTOMAT",cod:"ZSR-DCA-14C",d:"Circuncisão 14C",rs:4,sc:1,sp:0,pr:0,ba:0},
   {f:"ANASTOMAT",cod:"ZSR-DCA-16C",d:"Circuncisão 16C",rs:0,sc:1,sp:2,pr:2,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-18C",d:"Circuncisão 18C",rs:4,sc:7,sp:2,pr:3,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-22C",d:"Circuncisão 22C",rs:6,sc:13,sp:6,pr:5,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-26C",d:"Circuncisão 26C",rs:8,sc:10,sp:3,pr:5,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-30C",d:"Circuncisão 30C",rs:5,sc:9,sp:3,pr:7,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-34C",d:"Circuncisão 34C",rs:6,sc:10,sp:6,pr:7,ba:0},
+  {f:"ANASTOMAT",cod:"ZSR-DCA-18C",d:"Circuncisão 18C",rs:4,sc:7,sp:2,pr:4,ba:0},
+  {f:"ANASTOMAT",cod:"ZSR-DCA-22C",d:"Circuncisão 22C",rs:6,sc:13,sp:6,pr:6,ba:0},
+  {f:"ANASTOMAT",cod:"ZSR-DCA-26C",d:"Circuncisão 26C",rs:8,sc:10,sp:3,pr:4,ba:0},
+  {f:"ANASTOMAT",cod:"ZSR-DCA-30C",d:"Circuncisão 30C",rs:5,sc:9,sp:3,pr:8,ba:0},
+  {f:"ANASTOMAT",cod:"ZSR-DCA-34C",d:"Circuncisão 34C",rs:6,sc:10,sp:6,pr:8,ba:0},
   {f:"CALIBER",cod:"VCB-10X8",d:"Membrana Reconstrutora",rs:1,sc:0,sp:5,pr:3,ba:0},
   {f:"ELEFANT",cod:"ASP165",d:"Cânula Irrigação 35cm",rs:4,sc:2,sp:0,pr:3,ba:0},
-  {f:"ELEFANT",cod:"ASP185",d:"Cânula Irrigação 45cm",rs:422,sc:14,sp:136,pr:15,ba:0},
+  {f:"ELEFANT",cod:"ASP185",d:"Cânula Irrigação 45cm",rs:422,sc:13,sp:136,pr:15,ba:0},
   {f:"INFRA",cod:"ES2814",d:"Prótese Titan Infrapubic 14cm",rs:2,sc:0,sp:0,pr:0,ba:0},
   {f:"INFRA",cod:"ES2816",d:"Prótese Titan Infrapubic 16cm",rs:4,sc:0,sp:0,pr:0,ba:0},
   {f:"INFRA",cod:"ES2818",d:"Prótese Titan Infrapubic 18cm",rs:5,sc:0,sp:1,pr:3,ba:0},
@@ -108,12 +108,12 @@ const allData = [
   {f:"INTRUM. TITAN",cod:"KITINSTRTITAN",d:"Kit Instrumentos Titan",rs:3,sc:1,sp:0,pr:1,ba:0},
   {f:"INTRUM. TITAN",cod:"QB55552",d:"Furlow Inserter",rs:5,sc:2,sp:0,pr:0,ba:0},
   {f:"INTRUM. TITAN",cod:"QB5558",d:"Kit Dilatadores Rossello",rs:4,sc:2,sp:2,pr:1,ba:0},
-  {f:"KIT DE MONTAGEM",cod:"519150",d:"Kit Montagem s/ Extensor",rs:3,sc:0,sp:1,pr:1,ba:0},
+  {f:"KIT DE MONTAGEM",cod:"519150",d:"Kit Montagem s/ Extensor",rs:3,sc:0,sp:0,pr:1,ba:0},
   {f:"KIT DE MONTAGEM",cod:"519170",d:"Kit Montagem Titan",rs:0,sc:0,sp:1,pr:2,ba:0},
-  {f:"KIT DE MONTAGEM",cod:"519310",d:"Extensor Prótese Titan 0,5",rs:3,sc:0,sp:1,pr:1,ba:0},
-  {f:"MALEAVEL",cod:"519250",d:"Implante Maleável Genesis 9,5mm",rs:4,sc:4,sp:3,pr:6,ba:0},
-  {f:"MALEAVEL",cod:"519260",d:"Implante Maleável Genesis 11mm",rs:2,sc:3,sp:2,pr:6,ba:0},
-  {f:"MALEAVEL",cod:"519270",d:"Implante Maleável Genesis 13mm",rs:8,sc:4,sp:3,pr:5,ba:0},
+  {f:"KIT DE MONTAGEM",cod:"519310",d:"Extensor Prótese Titan 0,5",rs:3,sc:0,sp:0,pr:1,ba:0},
+  {f:"MALEAVEL",cod:"519250",d:"Implante Maleável Genesis 9,5mm",rs:5,sc:3,sp:3,pr:6,ba:0},
+  {f:"MALEAVEL",cod:"519260",d:"Implante Maleável Genesis 11mm",rs:3,sc:2,sp:2,pr:6,ba:0},
+  {f:"MALEAVEL",cod:"519270",d:"Implante Maleável Genesis 13mm",rs:9,sc:3,sp:3,pr:5,ba:0},
   {f:"NARROW INFRA",cod:"519300",d:"Narrow Kit Montagem Titan",rs:2,sc:0,sp:1,pr:0,ba:0},
   {f:"NARROW INFRA",cod:"EN2814",d:"Prótese NB Infra 14cm",rs:1,sc:0,sp:0,pr:0,ba:0},
   {f:"NARROW INFRA",cod:"EN2816",d:"Prótese NB Infra 16cm",rs:1,sc:0,sp:0,pr:0,ba:0},
@@ -123,13 +123,13 @@ const allData = [
   {f:"NARROW PENO",cod:"EN2918",d:"Prótese NB Escr 18cm",rs:0,sc:0,sp:1,pr:0,ba:0},
   {f:"PENO",cod:"E17924",d:"Prótese Titan Escrotal 24cm",rs:1,sc:0,sp:0,pr:1,ba:0},
   {f:"PENO",cod:"ES2914",d:"Prótese Titan Escrotal 14cm",rs:2,sc:0,sp:2,pr:1,ba:0},
-  {f:"PENO",cod:"ES2916",d:"Prótese Titan Escrotal 16cm",rs:5,sc:0,sp:2,pr:2,ba:0},
+  {f:"PENO",cod:"ES2916",d:"Prótese Titan Escrotal 16cm",rs:5,sc:0,sp:1,pr:2,ba:0},
   {f:"PENO",cod:"ES2918",d:"Prótese Titan Escrotal 18cm",rs:0,sc:0,sp:1,pr:0,ba:0},
   {f:"PENO",cod:"ES2920",d:"Prótese Titan Escrotal 20cm",rs:2,sc:0,sp:1,pr:2,ba:0},
-  {f:"PENO",cod:"ES2922",d:"Prótese Titan Escrotal 22cm",rs:1,sc:0,sp:1,pr:1,ba:0},
-  {f:"RESERVATORIO",cod:"ER8075",d:"Reservatório OTR 75cc",rs:7,sc:0,sp:2,pr:3,ba:0},
+  {f:"PENO",cod:"ES2922",d:"Prótese Titan Escrotal 22cm",rs:3,sc:0,sp:1,pr:1,ba:0},
+  {f:"RESERVATORIO",cod:"ER8075",d:"Reservatório OTR 75cc",rs:7,sc:0,sp:1,pr:3,ba:0},
   {f:"RESERVATORIO",cod:"ER8125",d:"Reservatório OTR 125cc",rs:16,sc:0,sp:2,pr:2,ba:0},
-  {f:"UROLIFT",cod:"UL400-AM",d:"System Implante Urológico",rs:29,sc:25,sp:20,pr:18,ba:0}
+  {f:"UROLIFT",cod:"UL400-AM",d:"System Implante Urológico",rs:34,sc:25,sp:20,pr:18,ba:0}
 ];
 
 const familias = [...new Set(allData.map(d=>d.f))];
