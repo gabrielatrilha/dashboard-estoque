@@ -50,6 +50,12 @@ tfoot td { background: #1f4e79; color: #fff; font-weight: 600; font-size: 12px; 
 tfoot td.num { text-align: right; white-space: nowrap; }
 .dash { color: #ccc; }
 .noprice { display: inline-block; font-size: 10px; color: #a15c00; background: #fff3dc; border: 1px solid #f3d9a4; border-radius: 4px; padding: 1px 6px; }
+tbody tr.row { cursor: pointer; }
+tbody tr.row.picked td { background: #e3edf7; font-weight: 600; }
+.chip { display: none; align-items: center; gap: 8px; font-size: 12px; background: #1f4e79; color: #fff; border-radius: 14px; padding: 4px 6px 4px 12px; }
+.chip.show { display: inline-flex; }
+.chip button { border: none; background: rgba(255,255,255,.2); color: #fff; border-radius: 10px; width: 20px; height: 20px; cursor: pointer; font-size: 12px; line-height: 20px; padding: 0; }
+.chip button:hover { background: rgba(255,255,255,.35); }
 .note { font-size: 11px; color: #888; margin-top: 12px; line-height: 1.6; }
 @media print {
 body { padding: 10px; background: #fff; }
@@ -93,12 +99,14 @@ body { padding: 10px; background: #fff; }
 <div class="controls no-print">
 <label><input type="checkbox" id="hideZero" checked> Ocultar zerados</label>
 <label><input type="checkbox" id="onlyNoPrice"> Só itens sem preço</label>
+<span class="chip" id="itemChip"><span id="itemChipTxt"></span><button id="itemChipX" title="Limpar filtro">✕</button></span>
 <span class="count" id="countLabel"></span>
 </div>
 
 <div class="table-scroll" id="tableWrap"></div>
 
-<p class="note">Quantidade = Saldo Prateleira + Saldo Consignado, por Unidade_Empresa (C61 RS · C67 SC · C63 SP · C64 PR · C68 BA).<br>
+<p class="note">Clique em um produto na tabela para filtrar só ele (cards e totais passam a mostrar apenas esse item); clique de novo ou no ✕ para limpar. Clicar no nome da família filtra a família.<br>
+Quantidade = Saldo Prateleira + Saldo Consignado, por Unidade_Empresa (C61 RS · C67 SC · C63 SP · C64 PR · C68 BA).<br>
 Valor = quantidade × custo unitário da tabela de preços. Itens marcados <span class="noprice">sem preço</span> não constam na tabela e ficam fora do valor total.</p>
 </div>
 
@@ -156,7 +164,13 @@ familias.forEach(f => {
   famWrap.appendChild(b);
 });
 
-let selEst = 'ALL', selFam = 'ALL';
+let selEst = 'ALL', selFam = 'ALL', selItem = null;
+
+function setFam(v) {
+  selFam = v; selItem = null;
+  document.querySelectorAll('#famBtns .btn').forEach(b => b.classList.toggle('active', b.dataset.val===v));
+  render();
+}
 
 function setEst(v) {
   selEst = v;
@@ -167,12 +181,15 @@ document.getElementById('estBtns').addEventListener('click', e => {
   const btn = e.target.closest('.btn'); if (btn) setEst(btn.dataset.val);
 });
 document.getElementById('famBtns').addEventListener('click', e => {
-  const btn = e.target.closest('.btn'); if (!btn) return;
-  selFam = btn.dataset.val;
-  document.querySelectorAll('#famBtns .btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  const btn = e.target.closest('.btn'); if (btn) setFam(btn.dataset.val);
+});
+document.getElementById('tableWrap').addEventListener('click', e => {
+  const tr = e.target.closest('tr.row'); if (!tr) return;
+  if (e.target.closest('td.fam') && e.target.closest('td.fam').textContent) { setFam(tr.dataset.fam); return; }
+  selItem = (selItem === tr.dataset.cod) ? null : tr.dataset.cod;
   render();
 });
+document.getElementById('itemChipX').addEventListener('click', () => { selItem = null; render(); });
 document.getElementById('kpis').addEventListener('click', e => {
   const k = e.target.closest('.kpi'); if (k) setEst(k.dataset.val);
 });
@@ -200,7 +217,11 @@ function render() {
   const hideZero = document.getElementById('hideZero').checked;
   const onlyNoPrice = document.getElementById('onlyNoPrice').checked;
   let data = selFam === 'ALL' ? [...allData] : allData.filter(d=>d.f===selFam);
+  if (selItem) data = allData.filter(d=>d.cod===selItem);
   renderKpis(data);
+  const chip = document.getElementById('itemChip');
+  if (selItem) { const it = allData.find(d=>d.cod===selItem); document.getElementById('itemChipTxt').textContent = 'Filtro: ' + it.cod + ' — ' + it.d; chip.classList.add('show'); }
+  else chip.classList.remove('show');
   data.sort((a,b) => {
     if (a.f !== b.f) return a.f.localeCompare(b.f);
     const na = sizeKey(a.d), nb = sizeKey(b.d);
@@ -209,7 +230,7 @@ function render() {
   });
   const showAll = selEst === 'ALL';
   const states = showAll ? S : [selEst];
-  if (hideZero) data = data.filter(d => states.reduce((t,s)=>t+d[s],0) > 0);
+  if (hideZero && !selItem) data = data.filter(d => states.reduce((t,s)=>t+d[s],0) > 0);
   if (onlyNoPrice) data = data.filter(d => d.p==null);
 
   document.getElementById('countLabel').textContent = data.length + ' produtos';
@@ -226,7 +247,7 @@ function render() {
     const val = r.p==null ? null : t*r.p;
     states.forEach(s=>totals[s]+=r[s]); gt+=t; gv+=val||0;
     const nf = r.f!==currentFam; if(nf) currentFam=r.f;
-    html += '<tr class="'+(nf?'fam-start':'')+'">';
+    html += '<tr class="row'+(nf?' fam-start':'')+(selItem===r.cod?' picked':'')+'" data-cod="'+r.cod+'" data-fam="'+r.f+'">';
     html += '<td class="fam">'+(nf?r.f:'')+'</td>';
     html += '<td class="cod">'+r.cod+'</td>';
     html += '<td>'+r.d+'</td>';
