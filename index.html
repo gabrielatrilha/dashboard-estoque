@@ -6,7 +6,7 @@
 <title>Estoque Emultec por Estado — 10/09/2026</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', Arial, sanhs-serif; background: #f5f6f8; color: #1a1a1a; padding: 24px; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f6f8; color: #1a1a1a; padding: 24px; }
 #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; }
 #login-screen h2 { font-size: 20px; color: #1f4e79; margin-bottom: 6px; }
 #login-screen p { font-size: 13px; color: #888; margin-bottom: 20px; }
@@ -24,208 +24,268 @@ h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; color: #1f4e79; }
 .btn:hover { background: #eef3f9; border-color: #aaa; }
 .btn.active { background: #1f4e79; color: #fff; border-color: #1f4e79; font-weight: 600; }
 .btn .dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
-.controls { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+.kpi { background: #fff; border-radius: 8px; padding: 12px 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-top: 3px solid #1f4e79; cursor: pointer; transition: box-shadow .15s; }
+.kpi:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.kpi.sel { outline: 2px solid #1f4e79; }
+.kpi .lbl { font-size: 11px; color: #777; text-transform: uppercase; letter-spacing: .4px; font-weight: 600; }
+.kpi .val { font-size: 18px; font-weight: 700; color: #1a1a1a; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.kpi .qty { font-size: 12px; color: #888; margin-top: 2px; }
+.controls { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
 .controls label { font-size: 12px; color: #777; display: flex; align-items: center; gap: 4px; cursor: pointer; }
 .count { font-size: 12px; color: #aaa; margin-left: auto; }
-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-thead th { background: #1f4e79; color: #fff; font-weight: 500; font-size: 12px; padding: 10px 8px; text-align: left; }
+.table-scroll { overflow-x: auto; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+table { width: 100%; border-collapse: collapse; background: #fff; }
+thead th { background: #1f4e79; color: #fff; font-weight: 500; font-size: 12px; padding: 10px 8px; text-align: left; white-space: nowrap; }
 thead th.num { text-align: right; }
+thead th.money { background: #163a5c; }
 tbody td { padding: 7px 8px; font-size: 12px; border-bottom: 1px solid #eee; }
-tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tbody td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tbody td.money { background: #f8fafc; }
 tbody td.fam { font-weight: 600; font-size: 11px; }
-tbody td.cod { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; }
+tbody td.cod { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; white-space: nowrap; }
 tbody tr.fam-start td { border-top: 2px solid #d0dbe6; }
 tbody tr:hover td { background: #f0f5fa; }
 tfoot td { background: #1f4e79; color: #fff; font-weight: 600; font-size: 12px; padding: 10px 8px; }
-tfoot td.num { text-align: right; }
+tfoot td.num { text-align: right; white-space: nowrap; }
 .dash { color: #ccc; }
+.noprice { display: inline-block; font-size: 10px; color: #a15c00; background: #fff3dc; border: 1px solid #f3d9a4; border-radius: 4px; padding: 1px 6px; }
+.note { font-size: 11px; color: #888; margin-top: 12px; line-height: 1.6; }
 @media print {
-  body { padding: 10px; background: #fff; }
-  .btn-group, .controls, .no-print { display: none !important; }
-  table { box-shadow: none; }
+body { padding: 10px; background: #fff; }
+.btn-group, .controls, .no-print { display: none !important; }
+.table-scroll, .kpi { box-shadow: none; }
 }
 </style>
 </head>
 <body>
 
 <div id="login-screen">
-  <h2>Estoque Emultec</h2>
-  <p>Digite a senha para acessar o relatório</p>
-  <input type="password" id="pwd" placeholder="Senha" onkeydown="if(event.key==='Enter')checkPwd()">
-  <button onclick="checkPwd()">Entrar</button>
-  <span class="error" id="pwd-error">Senha incorreta</span>
+<h2>Estoque Emultec</h2>
+<p>Digite a senha para acessar o relatório</p>
+<input type="password" id="pwd" placeholder="Senha" onkeydown="if(event.key==='Enter')checkPwd()">
+<button onclick="checkPwd()">Entrar</button>
+<span class="error" id="pwd-error">Senha incorreta</span>
 </div>
 
 <div id="app">
-<a href="https://gabrielatrilha.github.io/MagnumImport/" style="color:#1f4e79;text-decoration:none;font-size:13px;font-weight:600">← Portal</a>    <h1>Relatório de Estoque por Estado</h1>
-<p class="subtitle">Fonte: bi.emultec.com.br — estoque_analítico (Locais) — 10/09/2026</p>
+<a href="https://gabrielatrilha.github.io/MagnumImport/" style="color:#1f4e79;text-decoration:none;font-size:13px;font-weight:600">← Portal</a> <h1>Relatório de Estoque por Estado</h1>
+<p class="subtitle">Fonte: bi.emultec.com.br — estoque_analítico (Locais) — 10/09/2026 · Valores: custo unitário da tabela VALORES DE COMPRA</p>
 
+<p class="section-label">Valor em estoque (custo de compra)</p>
+<div class="kpis" id="kpis"></div>
 
 <p class="section-label">Estado</p>
 <div class="btn-group" id="estBtns">
-  <button class="btn active" data-val="ALL">Todos</button>
-  <button class="btn" data-val="rs"><span class="dot" style="background:#3266ad"></span>RS (C61)</button>
-  <button class="btn" data-val="sc"><span class="dot" style="background:#1D9E75"></span>SC (C67)</button>
-  <button class="btn" data-val="sp"><span class="dot" style="background:#D85A30"></span>SP (C63)</button>
-  <button class="btn" data-val="pr"><span class="dot" style="background:#7F77DD"></span>PR (C64)</button>
-  <button class="btn" data-val="ba"><span class="dot" style="background:#E6A817"></span>BA (C68)</button>
+<button class="btn active" data-val="ALL">Todos</button>
+<button class="btn" data-val="rs"><span class="dot" style="background:#3266ad"></span>RS (C61)</button>
+<button class="btn" data-val="sc"><span class="dot" style="background:#1D9E75"></span>SC (C67)</button>
+<button class="btn" data-val="sp"><span class="dot" style="background:#D85A30"></span>SP (C63)</button>
+<button class="btn" data-val="pr"><span class="dot" style="background:#7F77DD"></span>PR (C64)</button>
+<button class="btn" data-val="ba"><span class="dot" style="background:#E6A817"></span>BA (C68)</button>
 </div>
 
 <p class="section-label">Família</p>
 <div class="btn-group" id="famBtns">
-  <button class="btn active" data-val="ALL">Todas</button>
+<button class="btn active" data-val="ALL">Todas</button>
 </div>
 
 <div class="controls no-print">
-  <label><input type="checkbox" id="hideZero" checked> Ocultar zerados</label>
-  <span class="count" id="countLabel"></span>
+<label><input type="checkbox" id="hideZero" checked> Ocultar zerados</label>
+<label><input type="checkbox" id="onlyNoPrice"> Só itens sem preço</label>
+<span class="count" id="countLabel"></span>
 </div>
 
-<div id="tableWrap"></div>
+<div class="table-scroll" id="tableWrap"></div>
+
+<p class="note">Quantidade = Saldo Prateleira + Saldo Consignado, por Unidade_Empresa (C61 RS · C67 SC · C63 SP · C64 PR · C68 BA).<br>
+Valor = quantidade × custo unitário da tabela de preços. Itens marcados <span class="noprice">sem preço</span> não constam na tabela e ficam fora do valor total.</p>
+</div>
 
 <script>
 const allData = [
-  {f:"ANASTOMAT",cod:"ZSR-DCA-12C",d:"Circuncisão 12C",rs:0,sc:0,sp:1,pr:2,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-14C",d:"Circuncisão 14C",rs:4,sc:1,sp:0,pr:0,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-16C",d:"Circuncisão 16C",rs:0,sc:1,sp:2,pr:2,ba:0},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-18C",d:"Circuncisão 18C",rs:6,sc:4,sp:2,pr:6,ba:1},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-22C",d:"Circuncisão 22C",rs:6,sc:11,sp:6,pr:7,ba:1},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-26C",d:"Circuncisão 26C",rs:9,sc:13,sp:4,pr:5,ba:4},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-30C",d:"Circuncisão 30C",rs:8,sc:9,sp:2,pr:9,ba:3},
-  {f:"ANASTOMAT",cod:"ZSR-DCA-34C",d:"Circuncisão 34C",rs:7,sc:11,sp:6,pr:9,ba:3},
-  {f:"CALIBER",cod:"VCB-10X8",d:"Membrana Reconstrutora",rs:7,sc:0,sp:3,pr:3,ba:3},
-  {f:"ELEFANT",cod:"ASP165",d:"Cânula Irrigação 35cm",rs:4,sc:2,sp:0,pr:3,ba:0},
-  {f:"ELEFANT",cod:"ASP185",d:"Cânula Irrigação 45cm",rs:311,sc:18,sp:51,pr:15,ba:2},
-  {f:"INFRA",cod:"ES2814",d:"Prótese Titan Infrapubic 14cm",rs:2,sc:0,sp:0,pr:0,ba:0},
-  {f:"INFRA",cod:"ES2816",d:"Prótese Titan Infrapubic 16cm",rs:4,sc:0,sp:0,pr:0,ba:0},
-  {f:"INFRA",cod:"ES2818",d:"Prótese Titan Infrapubic 18cm",rs:4,sc:0,sp:1,pr:3,ba:0},
-  {f:"INFRA",cod:"ES2820",d:"Prótese Titan Infrapubic 20cm",rs:4,sc:0,sp:0,pr:0,ba:0},
-  {f:"INFRA",cod:"ES2822",d:"Prótese Titan Infrapubic 22cm",rs:4,sc:0,sp:0,pr:0,ba:0},
-  {f:"INTRUM. GENESIS",cod:"39801-MCC",d:"Medidor Corpo Cavernoso",rs:4,sc:0,sp:0,pr:0,ba:0},
-  {f:"INTRUM. GENESIS",cod:"EXTENSORES",d:"Extensores Genesis",rs:1,sc:0,sp:0,pr:0,ba:0},
-  {f:"INTRUM. TITAN",cod:"AFASTADOR L.STAR",d:"Afastador Lone Star",rs:2,sc:0,sp:0,pr:0,ba:1},
-  {f:"INTRUM. TITAN",cod:"DILATADORES BROOKS",d:"Kit Dilatadores Brooks",rs:0,sc:2,sp:0,pr:1,ba:1},
-  {f:"INTRUM. TITAN",cod:"KITINSTRTITAN",d:"Kit Instrumentos Titan",rs:3,sc:1,sp:0,pr:1,ba:0},
-  {f:"INTRUM. TITAN",cod:"QB55552",d:"Furlow Inserter",rs:5,sc:2,sp:0,pr:0,ba:2},
-  {f:"INTRUM. TITAN",cod:"QB5558",d:"Kit Dilatadores Rossello",rs:4,sc:2,sp:2,pr:1,ba:1},
-  {f:"KIT DE MONTAGEM",cod:"519150",d:"Kit Montagem s/ Extensor",rs:10,sc:0,sp:1,pr:1,ba:0},
-  {f:"KIT DE MONTAGEM",cod:"519170",d:"Kit Montagem Titan",rs:0,sc:0,sp:1,pr:2,ba:0},
-  {f:"KIT DE MONTAGEM",cod:"519310",d:"Extensor Prótese Titan 0,5",rs:8,sc:0,sp:1,pr:1,ba:0},
-  {f:"MALEAVEL",cod:"519250",d:"Implante Maleável Genesis 9,5mm",rs:6,sc:3,sp:3,pr:7,ba:3},
-  {f:"MALEAVEL",cod:"519260",d:"Implante Maleável Genesis 11mm",rs:3,sc:2,sp:0,pr:7,ba:3},
-  {f:"MALEAVEL",cod:"519270",d:"Implante Maleável Genesis 13mm",rs:21,sc:3,sp:3,pr:5,ba:3},
-  {f:"NARROW INFRA",cod:"519300",d:"Narrow Kit Montagem Titan",rs:2,sc:0,sp:1,pr:0,ba:0},
-  {f:"NARROW INFRA",cod:"EN2814",d:"Prótese NB Infra 14cm",rs:1,sc:0,sp:0,pr:0,ba:0},
-  {f:"NARROW INFRA",cod:"EN2816",d:"Prótese NB Infra 16cm",rs:1,sc:0,sp:0,pr:0,ba:0},
-  {f:"NARROW INFRA",cod:"EN2818",d:"Prótese NB Infra 18cm",rs:1,sc:0,sp:0,pr:0,ba:0},
-  {f:"NARROW PENO",cod:"EN2911",d:"Prótese NB Escr 11cm",rs:0,sc:0,sp:1,pr:0,ba:0},
-  {f:"NARROW PENO",cod:"EN2916",d:"Prótese NB Escr 16cm",rs:0,sc:0,sp:1,pr:0,ba:0},
-  {f:"NARROW PENO",cod:"EN2918",d:"Prótese NB Escr 18cm",rs:0,sc:0,sp:1,pr:0,ba:0},
-  {f:"PENO",cod:"E17924",d:"Prótese Titan Escrotal 24cm",rs:1,sc:0,sp:0,pr:1,ba:0},
-  {f:"PENO",cod:"ES2914",d:"Prótese Titan Escrotal 14cm",rs:1,sc:0,sp:2,pr:1,ba:1},
-  {f:"PENO",cod:"ES2916",d:"Prótese Titan Escrotal 16cm",rs:3,sc:0,sp:2,pr:2,ba:1},
-  {f:"PENO",cod:"ES2918",d:"Prótese Titan Escrotal 18cm",rs:4,sc:0,sp:2,pr:1,ba:0},
-  {f:"PENO",cod:"ES2920",d:"Prótese Titan Escrotal 20cm",rs:1,sc:0,sp:2,pr:1,ba:1},
-  {f:"PENO",cod:"ES2922",d:"Prótese Titan Escrotal 22cm",rs:2,sc:0,sp:1,pr:1,ba:1},
-  {f:"RESERVATORIO",cod:"ER8075",d:"Reservatório OTR 75cc",rs:6,sc:0,sp:2,pr:3,ba:1},
-  {f:"RESERVATORIO",cod:"ER8125",d:"Reservatório OTR 125cc",rs:13,sc:0,sp:2,pr:3,ba:0},
-  {f:"UROLIFT",cod:"UL400-AM",d:"System Implante Urológico",rs:11,sc:27,sp:20,pr:14,ba:0}
+{f:"ANASTOMAT",cod:"ZSR-DCA-12C",d:"Circuncisão 12C",rs:0,sc:0,sp:1,pr:2,ba:0,p:null},
+{f:"ANASTOMAT",cod:"ZSR-DCA-14C",d:"Circuncisão 14C",rs:4,sc:1,sp:0,pr:0,ba:0,p:null},
+{f:"ANASTOMAT",cod:"ZSR-DCA-16C",d:"Circuncisão 16C",rs:0,sc:1,sp:2,pr:2,ba:0,p:null},
+{f:"ANASTOMAT",cod:"ZSR-DCA-18C",d:"Circuncisão 18C",rs:6,sc:4,sp:2,pr:6,ba:1,p:732.0},
+{f:"ANASTOMAT",cod:"ZSR-DCA-22C",d:"Circuncisão 22C",rs:6,sc:11,sp:6,pr:7,ba:1,p:732.0},
+{f:"ANASTOMAT",cod:"ZSR-DCA-26C",d:"Circuncisão 26C",rs:9,sc:13,sp:4,pr:5,ba:4,p:732.0},
+{f:"ANASTOMAT",cod:"ZSR-DCA-30C",d:"Circuncisão 30C",rs:8,sc:9,sp:2,pr:8,ba:3,p:732.0},
+{f:"ANASTOMAT",cod:"ZSR-DCA-34C",d:"Circuncisão 34C",rs:7,sc:11,sp:6,pr:9,ba:3,p:732.0},
+{f:"CALIBER",cod:"VCB-10 X 8",d:"Membrana Reconstrutora",rs:7,sc:0,sp:3,pr:3,ba:3,p:3255.0},
+{f:"ELEFANT",cod:"ASP165",d:"Cânula Irrigação 35cm",rs:4,sc:2,sp:0,pr:3,ba:0,p:null},
+{f:"ELEFANT",cod:"ASP185",d:"Cânula Irrigação 45cm",rs:311,sc:18,sp:51,pr:15,ba:2,p:400.0},
+{f:"INFRA",cod:"ES2814",d:"Prótese Titan Infrapubic 14cm",rs:2,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INFRA",cod:"ES2816",d:"Prótese Titan Infrapubic 16cm",rs:4,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INFRA",cod:"ES2818",d:"Prótese Titan Infrapubic 18cm",rs:4,sc:0,sp:1,pr:3,ba:0,p:17325.0},
+{f:"INFRA",cod:"ES2820",d:"Prótese Titan Infrapubic 20cm",rs:4,sc:0,sp:0,pr:0,ba:0,p:17325.0},
+{f:"INFRA",cod:"ES2822",d:"Prótese Titan Infrapubic 22cm",rs:4,sc:0,sp:0,pr:0,ba:0,p:17325.0},
+{f:"INTRUM. GENESIS",cod:"39801-B10",d:"Dilatador Brooks 10mm",rs:0,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"39801-B11",d:"Dilatador Brooks 11mm",rs:0,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"39801-B12",d:"Dilatador Brooks 12mm",rs:0,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"39801-B13",d:"Dilatador Brooks 13mm",rs:0,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"39801-B14",d:"Dilatador Brooks 14mm",rs:0,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"39801-B8",d:"Dilatador Brooks 8mm",rs:0,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"39801-B9",d:"Dilatador Brooks 9mm",rs:0,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"39801-MCC",d:"Medidor Corpo Cavernoso",rs:4,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"39801-R10",d:"Dilatador Rossello 10mm",rs:0,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"39801-R11",d:"Dilatador Rossello 11mm",rs:0,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"39801-R12",d:"Dilatador Rossello 12mm",rs:0,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"39801-R8",d:"Dilatador Rossello 8mm",rs:0,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"39801-R9",d:"Dilatador Rossello 9mm",rs:0,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"40898-CXK",d:"Caixa Inox Kassierer 38x25x9cm",rs:3,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. GENESIS",cod:"EXTENSORES",d:"Extensores Genesis",rs:1,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. TITAN",cod:"40898-AD",d:"Afastador Deaver",rs:6,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. TITAN",cod:"40898-EK",d:"Espéculo Killian N4 90mm",rs:8,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. TITAN",cod:"40898-U",d:"Colocador em U",rs:3,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. TITAN",cod:"40900",d:"Pinça Crille Curva 14cm",rs:15,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. TITAN",cod:"AFASTADOR L.STAR",d:"Afastador Lone Star",rs:2,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. TITAN",cod:"DILATADORES BROOKS",d:"Kit Dilatadores Brooks",rs:4,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. TITAN",cod:"KITINSTRTITAN",d:"Kit Instrumentos Titan",rs:3,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. TITAN",cod:"QB55552",d:"Furlow Inserter",rs:5,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"INTRUM. TITAN",cod:"QB5558",d:"Kit Dilatadores Rossello",rs:4,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"KIT DE MONTAGEM",cod:"519150",d:"Kit Montagem s/ Extensor",rs:10,sc:0,sp:0,pr:1,ba:0,p:3750.0},
+{f:"KIT DE MONTAGEM",cod:"519170",d:"Kit Montagem Titan",rs:0,sc:0,sp:1,pr:2,ba:0,p:4200.0},
+{f:"KIT DE MONTAGEM",cod:"519310",d:"Extensor Prótese Titan 0,5",rs:8,sc:0,sp:1,pr:1,ba:0,p:750.0},
+{f:"MALEAVEL",cod:"519250",d:"Implante Maleável Genesis 9,5mm",rs:6,sc:3,sp:3,pr:7,ba:3,p:4000.0},
+{f:"MALEAVEL",cod:"519260",d:"Implante Maleável Genesis 11mm",rs:3,sc:2,sp:0,pr:7,ba:3,p:4000.0},
+{f:"MALEAVEL",cod:"519270",d:"Implante Maleável Genesis 13mm",rs:21,sc:3,sp:3,pr:5,ba:3,p:4000.0},
+{f:"NARROW INFRA",cod:"519300",d:"Narrow Kit Montagem Titan",rs:2,sc:0,sp:1,pr:0,ba:0,p:null},
+{f:"NARROW INFRA",cod:"EN2814",d:"Prótese NB Infra 14cm",rs:1,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"NARROW INFRA",cod:"EN2816",d:"Prótese NB Infra 16cm",rs:1,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"NARROW INFRA",cod:"EN2818",d:"Prótese NB Infra 18cm",rs:1,sc:0,sp:0,pr:0,ba:0,p:null},
+{f:"PENO",cod:"E17924",d:"Prótese Titan Escrotal 24cm",rs:0,sc:0,sp:0,pr:1,ba:0,p:null},
+{f:"PENO",cod:"ES2914",d:"Prótese Titan Escrotal 14cm",rs:1,sc:0,sp:2,pr:1,ba:1,p:null},
+{f:"PENO",cod:"ES2916",d:"Prótese Titan Escrotal 16cm",rs:3,sc:0,sp:2,pr:2,ba:1,p:17325.0},
+{f:"PENO",cod:"ES2918",d:"Prótese Titan Escrotal 18cm",rs:4,sc:0,sp:2,pr:1,ba:0,p:17325.0},
+{f:"PENO",cod:"ES2920",d:"Prótese Titan Escrotal 20cm",rs:1,sc:0,sp:2,pr:1,ba:1,p:17325.0},
+{f:"PENO",cod:"ES2922",d:"Prótese Titan Escrotal 22cm",rs:2,sc:0,sp:1,pr:1,ba:1,p:17325.0},
+{f:"RESERVATORIO",cod:"ER8075",d:"Reservatório OTR 75cc",rs:6,sc:0,sp:2,pr:3,ba:1,p:6350.0},
+{f:"RESERVATORIO",cod:"ER8125",d:"Reservatório OTR 125cc",rs:13,sc:0,sp:2,pr:3,ba:0,p:6050.0},
+{f:"UROLIFT",cod:"787.050",d:"Cesto Processamento Urolift",rs:0,sc:0,sp:5,pr:1,ba:0,p:null},
+{f:"UROLIFT",cod:"UL-SCOPE",d:"Urolift Cistoscópio 2,9mm",rs:0,sc:7,sp:5,pr:1,ba:0,p:null},
+{f:"UROLIFT",cod:"UL-SHEATH",d:"Urolift Bainha 20Fr",rs:0,sc:7,sp:5,pr:1,ba:0,p:null},
+{f:"UROLIFT",cod:"UL-TRAY",d:"Cesto Processamento Urolift",rs:0,sc:7,sp:0,pr:0,ba:0,p:null},
+{f:"UROLIFT",cod:"UL-VO",d:"Urolift Obturador Visual",rs:0,sc:7,sp:5,pr:1,ba:0,p:null},
+{f:"UROLIFT",cod:"UL400-AM",d:"System Implante Urológico",rs:19,sc:20,sp:20,pr:14,ba:0,p:1571.65}
 ];
 
-const familias = [...new Set(allData.map(d=>d.f))];
+const S = ['rs','sc','sp','pr','ba'];
+const sLabels = {rs:'RS',sc:'SC',sp:'SP',pr:'PR',ba:'BA'};
+const sColors = {rs:'#3266ad',sc:'#1D9E75',sp:'#D85A30',pr:'#7F77DD',ba:'#E6A817'};
+const brl = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const brl0 = v => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
+const int = v => v.toLocaleString('pt-BR');
+
+const familias = [...new Set(allData.map(d=>d.f))].sort();
 const famWrap = document.getElementById('famBtns');
 familias.forEach(f => {
   const b = document.createElement('button');
-  b.className = 'btn';
-  b.dataset.val = f;
-  b.textContent = f;
+  b.className = 'btn'; b.dataset.val = f; b.textContent = f;
   famWrap.appendChild(b);
 });
 
 let selEst = 'ALL', selFam = 'ALL';
 
-document.getElementById('estBtns').addEventListener('click', e => {
-  const btn = e.target.closest('.btn');
-  if (!btn) return;
-  selEst = btn.dataset.val;
-  document.querySelectorAll('#estBtns .btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+function setEst(v) {
+  selEst = v;
+  document.querySelectorAll('#estBtns .btn').forEach(b => b.classList.toggle('active', b.dataset.val===v));
   render();
+}
+document.getElementById('estBtns').addEventListener('click', e => {
+  const btn = e.target.closest('.btn'); if (btn) setEst(btn.dataset.val);
 });
-
 document.getElementById('famBtns').addEventListener('click', e => {
-  const btn = e.target.closest('.btn');
-  if (!btn) return;
+  const btn = e.target.closest('.btn'); if (!btn) return;
   selFam = btn.dataset.val;
   document.querySelectorAll('#famBtns .btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   render();
 });
-
+document.getElementById('kpis').addEventListener('click', e => {
+  const k = e.target.closest('.kpi'); if (k) setEst(k.dataset.val);
+});
 document.getElementById('hideZero').addEventListener('change', render);
+document.getElementById('onlyNoPrice').addEventListener('change', render);
+
+function sizeKey(d) { return parseFloat(((d.match(/(\d+[\.,]?\d*)/)||[])[1]||'0').replace(',','.')) || 0; }
+
+function renderKpis(base) {
+  const q = {}, v = {}; let tq = 0, tv = 0, semPreco = 0;
+  S.forEach(s => { q[s]=0; v[s]=0; });
+  base.forEach(r => {
+    S.forEach(s => { q[s]+=r[s]; v[s]+=r[s]*(r.p||0); });
+    if (r.p==null && S.some(s=>r[s]>0)) semPreco++;
+  });
+  S.forEach(s => { tq+=q[s]; tv+=v[s]; });
+  let h = '<div class="kpi'+(selEst==='ALL'?' sel':'')+'" data-val="ALL"><div class="lbl">Total</div><div class="val">'+brl0(tv)+'</div><div class="qty">'+int(tq)+' un. · '+semPreco+' itens sem preço</div></div>';
+  S.forEach(s => {
+    h += '<div class="kpi'+(selEst===s?' sel':'')+'" data-val="'+s+'" style="border-top-color:'+sColors[s]+'"><div class="lbl">'+sLabels[s]+'</div><div class="val">'+brl0(v[s])+'</div><div class="qty">'+int(q[s])+' un.</div></div>';
+  });
+  document.getElementById('kpis').innerHTML = h;
+}
 
 function render() {
   const hideZero = document.getElementById('hideZero').checked;
+  const onlyNoPrice = document.getElementById('onlyNoPrice').checked;
   let data = selFam === 'ALL' ? [...allData] : allData.filter(d=>d.f===selFam);
+  renderKpis(data);
   data.sort((a,b) => {
     if (a.f !== b.f) return a.f.localeCompare(b.f);
-    const na = parseFloat((a.d.match(/(\d+[\.,]?\d*)\s*(cm|C|mm)?/i)||[])[1]) || 0;
-    const nb = parseFloat((b.d.match(/(\d+[\.,]?\d*)\s*(cm|C|mm)?/i)||[])[1]) || 0;
+    const na = sizeKey(a.d), nb = sizeKey(b.d);
     if (na !== nb) return na - nb;
     return a.d.localeCompare(b.d);
   });
   const showAll = selEst === 'ALL';
-  const states = showAll ? ['rs','sc','sp','pr','ba'] : [selEst];
-  const sLabels = {rs:'RS',sc:'SC',sp:'SP',pr:'PR',ba:'BA'};
-  const sColors = {rs:'#3266ad',sc:'#1D9E75',sp:'#D85A30',pr:'#7F77DD',ba:'#E6A817'};
-
-  if (hideZero) {
-    data = showAll ? data.filter(d=>(d.rs+d.sc+d.sp+d.pr+d.ba)>0) : data.filter(d=>d[selEst]>0);
-  }
+  const states = showAll ? S : [selEst];
+  if (hideZero) data = data.filter(d => states.reduce((t,s)=>t+d[s],0) > 0);
+  if (onlyNoPrice) data = data.filter(d => d.p==null);
 
   document.getElementById('countLabel').textContent = data.length + ' produtos';
 
   let currentFam = '';
   let html = '<table><thead><tr><th>Família</th><th>Código</th><th>Descrição</th>';
-  states.forEach(s => { html += '<th class="num" style="min-width:60px;">'+sLabels[s]+'</th>'; });
-  html += '<th class="num">Total</th></tr></thead><tbody>';
+  states.forEach(s => { html += '<th class="num" style="min-width:52px;">'+sLabels[s]+'</th>'; });
+  html += '<th class="num">Total</th><th class="num money">Custo unit.</th><th class="num money">Valor'+(showAll?'':' '+sLabels[selEst])+'</th></tr></thead><tbody>';
 
-  const totals = {}; states.forEach(s=>totals[s]=0); let gt=0;
+  const totals = {}; states.forEach(s=>totals[s]=0); let gt=0, gv=0;
 
   data.forEach(r => {
     const t = states.reduce((sum,s)=>sum+r[s],0);
-    states.forEach(s=>totals[s]+=r[s]); gt+=t;
+    const val = r.p==null ? null : t*r.p;
+    states.forEach(s=>totals[s]+=r[s]); gt+=t; gv+=val||0;
     const nf = r.f!==currentFam; if(nf) currentFam=r.f;
     html += '<tr class="'+(nf?'fam-start':'')+'">';
     html += '<td class="fam">'+(nf?r.f:'')+'</td>';
     html += '<td class="cod">'+r.cod+'</td>';
     html += '<td>'+r.d+'</td>';
     states.forEach(s => { html += '<td class="num">'+(r[s]||'<span class="dash">-</span>')+'</td>'; });
-    html += '<td class="num" style="font-weight:600;">'+t+'</td></tr>';
+    html += '<td class="num" style="font-weight:600;">'+t+'</td>';
+    html += '<td class="num money">'+(r.p==null?'<span class="noprice">sem preço</span>':brl(r.p))+'</td>';
+    html += '<td class="num money" style="font-weight:600;">'+(val==null?'<span class="dash">-</span>':(val?brl(val):'<span class="dash">-</span>'))+'</td></tr>';
   });
 
   html += '</tbody><tfoot><tr><td colspan="3">Total</td>';
-  states.forEach(s => { html += '<td class="num">'+totals[s]+'</td>'; });
-  html += '<td class="num">'+gt+'</td></tr></tfoot></table>';
+  states.forEach(s => { html += '<td class="num">'+int(totals[s])+'</td>'; });
+  html += '<td class="num">'+int(gt)+'</td><td></td><td class="num">'+brl(gv)+'</td></tr></tfoot></table>';
 
-  if (!data.length) html = '<p style="padding:20px;color:#aaa;">Nenhum produto com saldo para este filtro.</p>';
+  if (!data.length) html = '<p style="padding:20px;color:#aaa;background:#fff;">Nenhum produto com saldo para este filtro.</p>';
   document.getElementById('tableWrap').innerHTML = html;
 }
 
 render();
 </script>
-</div>
 
 <script>
 if(localStorage.getItem('mi_auth')){document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';}function checkPwd() {
-  var p = document.getElementById('pwd').value;
-  if (btoa(p) === 'bWFnbnVtQGVzdG9xdWU=') {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-  } else {
-    document.getElementById('pwd-error').style.display = 'block';
-    document.getElementById('pwd').value = '';
-  }
+var p = document.getElementById('pwd').value;
+if (btoa(p) === 'bWFnbnVtQGVzdG9xdWU=') {
+document.getElementById('login-screen').style.display = 'none';
+document.getElementById('app').style.display = 'block';
+} else {
+document.getElementById('pwd-error').style.display = 'block';
+document.getElementById('pwd').value = '';
+}
 }
 </script>
 </body>
